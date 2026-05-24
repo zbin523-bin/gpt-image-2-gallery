@@ -20,6 +20,9 @@
   .scroll-top { position: fixed; bottom: 20px; right: 20px; z-index: 50; }
   ::-webkit-scrollbar { width: 8px; }
   ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
+  .tag-filter { display: inline-flex; align-items: center; padding: 2px 8px; border-radius: 6px; font-size: 12px; cursor: pointer; transition: all 0.2s; }
+  .tag-filter:hover { opacity: 0.8; }
+  .tag-filter.active { background: #3b82f6; color: white; }
 </style>
 </head>
 <body class="bg-gray-50 min-h-screen">
@@ -44,23 +47,42 @@
           </svg>
         </div>
       </div>
-      <div class="text-xs text-gray-400" id="resultCount"></div>
+      <div class="flex items-center gap-2">
+        <span class="text-xs text-gray-400" id="resultCount"></span>
+        <a href="https://github.com/zbin523-bin/gpt-image-2-gallery" target="_blank" class="text-gray-400 hover:text-gray-600">
+          <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23A11.509 11.509 0 0112 5.803c1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576C20.566 21.797 24 17.3 24 12c0-6.627-5.373-12-12-12z"/></svg>
+        </a>
+      </div>
     </div>
   </div>
 </header>
 
-<!-- Category Nav -->
+<!-- Category Nav + Tag Filters -->
 <nav class="bg-white border-b border-gray-100 sticky top-[57px] z-30">
-  <div class="max-w-7xl mx-auto px-4 py-2 flex gap-2 overflow-x-auto" id="categoryNav">
-    <!-- Filled by JS -->
+  <div class="max-w-7xl mx-auto px-4 py-2">
+    <div class="flex gap-2 overflow-x-auto mb-2" id="categoryNav"></div>
+    <div class="flex gap-1.5 overflow-x-auto text-xs" id="tagFilters">
+      <span class="tag-filter bg-gray-100 text-gray-600" data-tag="photorealistic">写实</span>
+      <span class="tag-filter bg-gray-100 text-gray-600" data-tag="cinematic">电影感</span>
+      <span class="tag-filter bg-gray-100 text-gray-600" data-tag="35mm">35mm胶片</span>
+      <span class="tag-filter bg-gray-100 text-gray-600" data-tag="illustration">插画</span>
+      <span class="tag-filter bg-gray-100 text-gray-600" data-tag="poster">海报</span>
+      <span class="tag-filter bg-gray-100 text-gray-600" data-tag="product">产品</span>
+      <span class="tag-filter bg-gray-100 text-gray-600" data-tag="luxury">奢侈品</span>
+      <span class="tag-filter bg-gray-100 text-gray-600" data-tag="minimalist">极简</span>
+      <span class="tag-filter bg-gray-100 text-gray-600" data-tag="ui">UI</span>
+      <span class="tag-filter bg-gray-100 text-gray-600" data-tag="character">角色</span>
+      <span class="tag-filter bg-gray-100 text-gray-600" data-tag="fashion">时尚</span>
+      <span class="tag-filter bg-gray-100 text-gray-600" data-tag="food">美食</span>
+      <span class="tag-filter bg-gray-100 text-gray-600" data-tag="advertisement">广告</span>
+      <span class="tag-filter bg-purple-100 text-purple-600" data-tag="has_arguments">有参数模板</span>
+    </div>
   </div>
 </nav>
 
 <!-- Main Content -->
 <main class="max-w-7xl mx-auto px-4 py-6">
-  <div id="galleryGrid" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4">
-    <!-- Filled by JS -->
-  </div>
+  <div id="galleryGrid" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4"></div>
   <div id="noResults" class="hidden text-center py-20 text-gray-400">
     <svg class="w-16 h-16 mx-auto mb-4 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
@@ -76,9 +98,7 @@
     <button id="closeModal" class="absolute top-4 right-4 w-8 h-8 bg-gray-100 hover:bg-gray-200 rounded-full flex items-center justify-center text-gray-600 transition z-10">
       <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
     </button>
-    <div id="modalContent" class="p-6 md:p-8">
-      <!-- Filled by JS -->
-    </div>
+    <div id="modalContent" class="p-6 md:p-8"></div>
   </div>
 </div>
 
@@ -88,24 +108,11 @@
 </button>
 
 <script>
-// ============ DATA LOADING ============
 let allData = [];
 let currentCategory = 'all';
 let currentSearch = '';
+let activeTags = new Set();
 
-async function loadData() {
-  try {
-    const resp = await fetch('data.json');
-    allData = await resp.json();
-    console.log(`Loaded ${allData.length} cases`);
-    initUI();
-  } catch(e) {
-    console.error('Failed to load data:', e);
-    document.getElementById('galleryGrid').innerHTML = '<p class="col-span-full text-center text-red-500 py-10">数据加载失败，请刷新页面重试</p>';
-  }
-}
-
-// ============ CATEGORIES ============
 const CATEGORIES = [
   { key: 'all', label: '全部', icon: '🎯' },
   { key: 'Portrait & Photography', label: '人像摄影', icon: '🍌' },
@@ -117,6 +124,34 @@ const CATEGORIES = [
   { key: 'Comparison & Community', label: '对比/社区', icon: '🧪' },
 ];
 
+// Tag keywords mapping for smart filtering
+const TAG_KEYWORDS = {
+  'photorealistic': ['photorealistic', 'realistic', 'real', 'photo', 'dslr', '8k', '4k', 'ultra-detailed', 'hyper-realistic'],
+  'cinematic': ['cinematic', 'movie', 'film', 'dramatic', 'studio', 'editorial'],
+  '35mm': ['35mm', 'film grain', 'analog', 'vintage film', 'kodak', 'fujifilm'],
+  'illustration': ['illustration', 'illustrated', 'art style', 'painting', 'watercolor', 'digital art'],
+  'poster': ['poster', 'advertising poster', 'campaign', 'billboard'],
+  'product': ['product photography', 'product shot', 'commercial product', 'ecommerce'],
+  'luxury': ['luxury', 'premium', 'high-end', 'upscale', 'exclusive', 'chanel', 'dior'],
+  'minimalist': ['minimalist', 'minimal', 'clean', 'simple', 'zen'],
+  'ui': ['ui', 'mockup', 'app design', 'landing page', 'screenshot', 'interface', 'web design'],
+  'character': ['character design', 'concept art', 'character sheet', 'reference card', 'game character'],
+  'fashion': ['fashion', 'editorial', 'vogue', 'runway', 'style', 'trendy', 'model'],
+  'food': ['food', 'beverage', 'restaurant', 'chef', 'cuisine', 'menu', 'drink'],
+  'advertisement': ['ad', 'advertising', 'campaign', 'commercial', 'brand', 'marketing'],
+  'has_arguments': ['{argument'],
+};
+
+async function loadData() {
+  try {
+    const resp = await fetch('data.json');
+    allData = await resp.json();
+    initUI();
+  } catch(e) {
+    document.getElementById('galleryGrid').innerHTML = '<p class="col-span-full text-center text-red-500 py-10">数据加载失败，请刷新页面重试</p>';
+  }
+}
+
 function getCategoryCount(catKey) {
   if (catKey === 'all') return allData.length;
   return allData.filter(d => d.category === catKey).length;
@@ -126,7 +161,7 @@ function initCategoryNav() {
   const nav = document.getElementById('categoryNav');
   nav.innerHTML = CATEGORIES.map(c => 
     `<button data-cat="${c.key}" class="cat-badge px-3 py-1.5 rounded-lg text-sm font-medium border transition whitespace-nowrap
-      ${c.key === 'all' ? 'bg-blue-500 text-white border-blue-500 active' : 'bg-white text-gray-700 border-gray-200 hover:border-blue-300 hover:bg-blue-50'}">
+      ${c.key === 'all' ? 'bg-blue-500 text-white border-blue-500 active' : 'bg-white text-gray-700 border-gray-200 hover:border-blue-300'}">
       ${c.icon} ${c.label} <span class="text-xs opacity-70">${getCategoryCount(c.key)}</span>
     </button>`
   ).join('');
@@ -145,20 +180,25 @@ function initCategoryNav() {
   });
 }
 
-// ============ SEARCH ============
-function setupSearch() {
-  const input = document.getElementById('searchInput');
-  let debounceTimer;
-  input.addEventListener('input', () => {
-    clearTimeout(debounceTimer);
-    debounceTimer = setTimeout(() => {
-      currentSearch = input.value.trim().toLowerCase();
+function setupTagFilters() {
+  const filtersEl = document.getElementById('tagFilters');
+  filtersEl.querySelectorAll('.tag-filter').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const tag = btn.dataset.tag;
+      if (activeTags.has(tag)) {
+        activeTags.delete(tag);
+        btn.classList.remove('active', 'bg-blue-500', 'text-white');
+        btn.classList.add(btn.dataset.tag === 'has_arguments' ? 'bg-purple-100' : 'bg-gray-100', btn.dataset.tag === 'has_arguments' ? 'text-purple-600' : 'text-gray-600');
+      } else {
+        activeTags.add(tag);
+        btn.classList.add('active', 'bg-blue-500', 'text-white');
+        btn.classList.remove('bg-gray-100', 'bg-purple-100', 'text-gray-600', 'text-purple-600');
+      }
       renderGallery();
-    }, 200);
+    });
   });
 }
 
-// ============ GALLERY RENDERING ============
 function getFilteredData() {
   let data = allData;
   if (currentCategory !== 'all') {
@@ -166,15 +206,23 @@ function getFilteredData() {
   }
   if (currentSearch) {
     data = data.filter(d => {
-      const searchFields = [d.title_en, d.title_zh, d.prompt, d.category, d.author].join(' ').toLowerCase();
-      return searchFields.includes(currentSearch);
+      const search = d.searchable_text || '';
+      return search.toLowerCase().includes(currentSearch);
+    });
+  }
+  if (activeTags.size > 0) {
+    data = data.filter(d => {
+      const promptLower = (d.prompt || '').toLowerCase();
+      return [...activeTags].every(tag => {
+        const keywords = TAG_KEYWORDS[tag] || [tag];
+        return keywords.some(kw => promptLower.includes(kw));
+      });
     });
   }
   return data;
 }
 
 function highlightArguments(text) {
-  // Highlight {argument name=... default=...} patterns
   return text.replace(/\{argument\s+name="([^"]+)"\s+default="([^"]+)"\}/g, 
     '<span class="prompt-arg" title="可替换参数：$1，默认值：$2">{$1=$2}</span>');
 }
@@ -190,7 +238,6 @@ function renderGallery() {
   const grid = document.getElementById('galleryGrid');
   const noResults = document.getElementById('noResults');
   const countEl = document.getElementById('resultCount');
-
   countEl.textContent = `${data.length} 个案例`;
 
   if (data.length === 0) {
@@ -209,7 +256,7 @@ function renderGallery() {
     return `<div class="card bg-white rounded-xl border border-gray-200 overflow-hidden cursor-pointer hover:shadow-lg hover:border-blue-300 transition fade-in" data-id="${d.id}">
       <div class="relative overflow-hidden bg-gray-100">
         <img src="${d.image_url}" alt="${title}" class="card-img w-full" loading="lazy"
-          onerror="this.src=''; this.parentElement.innerHTML='<div class=\\'flex items-center justify-center h-full text-gray-400 text-sm\\'>图片不可用</div>'">
+          onerror="this.src=''; this.parentElement.innerHTML='<div class=\\'flex items-center justify-center h-40 text-gray-400 text-sm\\'>图片不可用</div>'">
         <div class="absolute top-2 left-2 px-2 py-0.5 rounded-md text-xs font-medium bg-white/90 shadow-sm">
           ${d.category_icon} ${catLabel}
         </div>
@@ -223,17 +270,14 @@ function renderGallery() {
     </div>`;
   }).join('');
 
-  // Add click handlers
   grid.querySelectorAll('.card').forEach(card => {
     card.addEventListener('click', () => showDetail(card.dataset.id));
   });
 }
 
-// ============ DETAIL MODAL ============
 function showDetail(id) {
   const d = allData.find(e => e.id === id);
   if (!d) return;
-
   const modal = document.getElementById('detailModal');
   const content = document.getElementById('modalContent');
   const catLabel = CATEGORIES.find(c => c.key === d.category)?.label || d.category;
@@ -244,7 +288,7 @@ function showDetail(id) {
       <div class="lg:w-1/2">
         <div class="bg-gray-100 rounded-xl overflow-hidden">
           <img src="${d.image_url}" alt="${title}" class="w-full object-contain max-h-[70vh]"
-            onerror="this.src=''; this.parentElement.innerHTML='<div class=\\'flex items-center justify-center h-64 text-gray-400\\'>图片不可用</div>'">
+            onerror="this.parentElement.innerHTML='<div class=\\'flex items-center justify-center h-64 text-gray-400\\'>图片不可用</div>'">
         </div>
       </div>
       <div class="lg:w-1/2 flex flex-col">
@@ -256,7 +300,6 @@ function showDetail(id) {
         <h2 class="text-xl font-bold text-gray-900 mb-1">${title}</h2>
         ${d.title_en !== title && d.title_zh ? `<p class="text-sm text-gray-500 mb-3">${d.title_en}</p>` : ''}
         ${d.author ? `<p class="text-xs text-gray-400 mb-3">作者: @${d.author}</p>` : ''}
-        
         <div class="flex-1">
           <h3 class="text-sm font-semibold text-gray-700 mb-2 flex items-center gap-1">
             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
@@ -266,7 +309,6 @@ function showDetail(id) {
             ${highlightArguments(d.prompt || '暂无提示词')}
           </div>
         </div>
-        
         <div class="flex gap-2 mt-4">
           <button onclick="copyPrompt('${id}')" class="px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white rounded-lg text-sm font-medium transition flex items-center gap-1">
             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3"/></svg>
@@ -284,7 +326,6 @@ function showDetail(id) {
       </div>
     </div>
   `;
-
   modal.classList.remove('hidden');
   document.body.style.overflow = 'hidden';
 }
@@ -298,46 +339,49 @@ function copyPrompt(id) {
   const d = allData.find(e => e.id === id);
   if (!d || !d.prompt) return;
   navigator.clipboard.writeText(d.prompt).then(() => {
-    // Show brief feedback
     const btn = document.querySelector('[onclick="copyPrompt(\''+id+'\')"]');
-    const origText = btn.innerHTML;
+    const orig = btn.innerHTML;
     btn.innerHTML = '<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg> 已复制';
-    setTimeout(() => btn.innerHTML = origText, 2000);
+    setTimeout(() => btn.innerHTML = orig, 2000);
   });
 }
 
 function downloadImage(url) {
   if (!url) return;
   const a = document.createElement('a');
-  a.href = url;
-  a.download = 'gpt-image-2-output.jpg';
-  a.target = '_blank';
-  a.click();
+  a.href = url; a.download = 'gpt-image-2-output.jpg'; a.target = '_blank'; a.click();
 }
 
-// ============ SCROLL TOP ============
+// ============ SEARCH WITH DEBOUNCE ============
+function setupSearch() {
+  const input = document.getElementById('searchInput');
+  let timer;
+  input.addEventListener('input', () => {
+    clearTimeout(timer);
+    timer = setTimeout(() => {
+      currentSearch = input.value.trim().toLowerCase();
+      renderGallery();
+    }, 200);
+  });
+}
+
 function setupScrollTop() {
   const btn = document.getElementById('scrollTopBtn');
-  window.addEventListener('scroll', () => {
-    btn.classList.toggle('hidden', window.scrollY < 400);
-  });
+  window.addEventListener('scroll', () => btn.classList.toggle('hidden', window.scrollY < 400));
   btn.addEventListener('click', () => window.scrollTo({ top: 0, behavior: 'smooth' }));
 }
 
-// ============ MODAL CLOSE ============
 function setupModal() {
   document.getElementById('closeModal').addEventListener('click', closeModal);
   document.getElementById('detailModal').addEventListener('click', (e) => {
     if (e.target === document.getElementById('detailModal')) closeModal();
   });
-  document.addEventListener('keydown', (e) => {
-    if (e.key === 'Escape') closeModal();
-  });
+  document.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeModal(); });
 }
 
-// ============ INIT ============
 function initUI() {
   initCategoryNav();
+  setupTagFilters();
   setupSearch();
   renderGallery();
   setupScrollTop();
